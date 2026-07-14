@@ -9,7 +9,7 @@
       content="속초·양양·강릉에서 함께 저장한 장소 14곳과 숙소를 한 지도에서 확인하세요."
     />
     <title>속초·양양·강릉 여행 링크</title>
-    <link rel="preconnect" href="https://tile.openstreetmap.org" />
+    <link rel="preconnect" href="https://basemaps.cartocdn.com" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -167,7 +167,7 @@
         position: absolute;
         z-index: 790;
         left: 12px;
-        bottom: calc(166px + env(safe-area-inset-bottom));
+        bottom: calc(250px + env(safe-area-inset-bottom));
         display: inline-flex;
         min-height: 44px;
         align-items: center;
@@ -205,7 +205,7 @@
         position: absolute;
         z-index: 795;
         left: 12px;
-        bottom: calc(218px + env(safe-area-inset-bottom));
+        bottom: calc(302px + env(safe-area-inset-bottom));
         max-width: calc(100% - 24px);
         margin: 0;
         padding: 9px 11px;
@@ -245,18 +245,22 @@
         position: absolute;
         z-index: 700;
         right: 10px;
-        bottom: calc(153px + env(safe-area-inset-bottom));
+        bottom: calc(237px + env(safe-area-inset-bottom));
         padding: 4px 7px;
         border-radius: 7px;
         background: rgba(255, 255, 255, 0.86);
         color: #596a74;
         font-size: 10px;
+      }
+
+      .map-attribution a {
+        color: inherit;
         text-decoration: none;
       }
 
       .leaflet-control-zoom {
         margin-right: 12px !important;
-        margin-bottom: calc(166px + env(safe-area-inset-bottom)) !important;
+        margin-bottom: calc(250px + env(safe-area-inset-bottom)) !important;
         overflow: hidden;
         border: 0 !important;
         border-radius: 14px !important;
@@ -285,15 +289,15 @@
 
       .category-marker .category-pin {
         display: grid;
-        width: 42px;
-        height: 42px;
+        width: 30px;
+        height: 30px;
         place-items: center;
-        border: 3px solid #fff;
-        border-radius: 50% 50% 50% 12px;
+        border: 2px solid #fff;
+        border-radius: 50% 50% 50% 9px;
         transform: rotate(-45deg);
         background: #e9516c;
         color: #fff;
-        box-shadow: 0 7px 18px rgba(120, 31, 50, 0.32);
+        box-shadow: 0 4px 11px rgba(120, 31, 50, 0.28);
         transition:
           transform 0.18s ease,
           background 0.18s ease;
@@ -301,12 +305,12 @@
 
       .category-marker.is-lodging .category-pin {
         background: #2483e2;
-        box-shadow: 0 7px 18px rgba(23, 99, 160, 0.32);
+        box-shadow: 0 4px 11px rgba(23, 99, 160, 0.28);
       }
 
       .category-marker .category-pin b {
         transform: rotate(45deg);
-        font-size: 13px;
+        font-size: 10px;
       }
 
       .category-marker.is-selected {
@@ -314,7 +318,7 @@
       }
 
       .category-marker.is-selected .category-pin {
-        transform: rotate(-45deg) scale(1.2);
+        transform: rotate(-45deg) scale(1.15);
         background: #17242d;
       }
 
@@ -338,7 +342,7 @@
       }
 
       .place-sheet.is-collapsed {
-        max-height: 146px;
+        max-height: 236px;
       }
 
       .place-sheet.is-expanded {
@@ -398,11 +402,43 @@
 
       .selected-place {
         display: grid;
-        grid-template-columns: 42px minmax(0, 1fr) auto;
-        gap: 11px;
-        min-height: 88px;
-        align-items: center;
-        padding: 1px 14px 16px;
+        grid-template-columns: 92px minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: 8px 12px;
+        min-height: 192px;
+        align-items: start;
+        padding: 2px 14px 14px;
+      }
+
+      .selected-photo-wrap {
+        position: relative;
+        display: grid;
+        grid-row: 1 / span 2;
+        width: 92px;
+        height: 132px;
+        align-self: center;
+        place-items: center;
+        overflow: hidden;
+        border-radius: 16px;
+        background: #e8eef1;
+      }
+
+      .selected-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .selected-photo-wrap .place-symbol {
+        position: absolute;
+        right: 7px;
+        bottom: 7px;
+        width: 30px;
+        height: 30px;
+        border: 2px solid #fff;
+        box-shadow: 0 3px 10px rgba(18, 39, 52, 0.22);
+        font-size: 10px;
       }
 
       .place-symbol {
@@ -437,6 +473,17 @@
         white-space: nowrap;
       }
 
+      .place-description {
+        display: -webkit-box;
+        overflow: hidden;
+        margin-top: 6px;
+        color: #42535d;
+        font-size: 11px;
+        line-height: 1.45;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
       .place-kind {
         display: inline-flex;
         width: fit-content;
@@ -464,7 +511,8 @@
 
       .place-actions {
         display: grid;
-        min-width: 104px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        min-width: 0;
         gap: 6px;
       }
 
@@ -552,25 +600,36 @@
         }
 
         .place-sheet.is-collapsed {
-          max-height: 184px;
+          max-height: 244px;
         }
 
         .selected-place {
-          grid-template-columns: 40px minmax(0, 1fr);
-          row-gap: 8px;
+          grid-template-columns: 82px minmax(0, 1fr);
+          gap: 7px 10px;
+          min-height: 200px;
+          padding-right: 10px;
+          padding-left: 10px;
         }
 
-        .place-actions {
-          grid-column: 1 / -1;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+        .selected-photo-wrap {
+          width: 82px;
+          height: 126px;
+        }
+
+        .current-location-button {
+          bottom: calc(258px + env(safe-area-inset-bottom));
+        }
+
+        .location-status {
+          bottom: calc(310px + env(safe-area-inset-bottom));
         }
 
         .map-attribution {
-          bottom: calc(190px + env(safe-area-inset-bottom));
+          bottom: calc(251px + env(safe-area-inset-bottom));
         }
 
         .leaflet-control-zoom {
-          margin-bottom: calc(204px + env(safe-area-inset-bottom)) !important;
+          margin-bottom: calc(264px + env(safe-area-inset-bottom)) !important;
         }
       }
 
@@ -634,12 +693,15 @@
         hidden
       ></p>
 
-      <a
-        class="map-attribution"
-        href="https://www.openstreetmap.org/copyright"
-        target="_blank"
-        rel="noreferrer"
-      >© OpenStreetMap</a>
+      <span class="map-attribution">
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noreferrer"
+        >© OpenStreetMap</a>
+        ·
+        <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">© CARTO</a>
+      </span>
 
       <section id="place-sheet" class="place-sheet is-collapsed" aria-label="저장한 장소">
         <button
@@ -677,10 +739,20 @@
         </button>
 
         <article id="selected-place" class="selected-place" aria-live="polite">
-          <span id="selected-symbol" class="place-symbol is-lodging" aria-label="숙소">숙</span>
+          <span class="selected-photo-wrap">
+            <img
+              id="selected-image"
+              class="selected-image"
+              alt="체스터톤스속초 대표 사진"
+              referrerpolicy="no-referrer"
+              decoding="async"
+            />
+            <span id="selected-symbol" class="place-symbol is-lodging" aria-label="숙소">숙</span>
+          </span>
           <span class="place-copy">
             <span id="selected-kind" class="place-kind">숙소</span>
             <strong id="selected-name">체스터톤스속초</strong>
+            <span id="selected-description" class="place-description"></span>
             <small id="selected-address">강원 속초시 엑스포로 109</small>
           </span>
           <span class="place-actions">
@@ -705,24 +777,24 @@
 
     <script id="place-data" type="application/json">
 [
-  {"id":"31670414","type":"restaurant","name":"속초항아리물회","address":"강원 속초시 해오름로188번길 11 1, 2, 3층","lng":128.6012141,"lat":38.1914896,"sourceUrl":"https://naver.me/xllLhrg9"},
-  {"id":"35308401","type":"restaurant","name":"아바이회국수","address":"강원 속초시 청호로 115-12 아바이회국수","lng":128.5943544,"lat":38.1999116,"sourceUrl":"https://naver.me/GCJ0PreS"},
-  {"id":"11726650","type":"restaurant","name":"신다신","address":"강원 속초시 아바이마을길 22","lng":128.5940629,"lat":38.2028231,"sourceUrl":"https://naver.me/FqIEOYvs"},
-  {"id":"15093015","type":"restaurant","name":"완도회식당","address":"강원 속초시 먹거리4길 21","lng":128.573046,"lat":38.195643,"sourceUrl":"https://naver.me/xF4njJf3"},
-  {"id":"1382428237","type":"restaurant","name":"속초751샌드위치","address":"강원 속초시 교동로 75-1","lng":128.576724,"lat":38.2056225,"sourceUrl":"https://naver.me/FLERu2ll"},
-  {"id":"1574212659","type":"bakery","name":"도리스 파티세리","address":"강원 속초시 중앙로147번길 26 1층 도리스 파티세리","lng":128.5897934,"lat":38.2038641,"sourceUrl":"https://naver.me/5Z19xhp5"},
-  {"id":"1377461131","type":"bakery","name":"두메타르트","address":"강원 속초시 설악산로4번길 15 1층 두메","lng":128.6073279,"lat":38.1649237,"sourceUrl":"https://naver.me/FRoUddae"},
-  {"id":"15081449","type":"restaurant","name":"동해막국수","address":"강원 양양군 현남면 동해대로 54 동해막국수","lng":128.8039381,"lat":37.9200661,"sourceUrl":"https://naver.me/x5GoZXtC"},
-  {"id":"1898517753","type":"restaurant","name":"동호해변 섭국","address":"강원 양양군 손양면 상운길 44-63","lng":128.6874113,"lat":38.0430323,"sourceUrl":"https://naver.me/x9BNol8L"},
-  {"id":"1693762102","type":"restaurant","name":"서울양계","address":"강원 강릉시 창해로 366","lng":128.9170949,"lat":37.7953296,"sourceUrl":"https://naver.me/Gqf5V0JP"},
-  {"id":"15380605","type":"restaurant","name":"해미가","address":"강원 강릉시 솔올로 103 교동 1807-2 1층 해미가","lng":128.878939,"lat":37.7710568,"sourceUrl":"https://naver.me/5l2HpohR"},
-  {"id":"1220981140","type":"bakery","name":"정남미명과 강릉본점","address":"강원 강릉시 경강로 2668 1층 정남미명과","lng":128.9502006,"lat":37.7705515,"sourceUrl":"https://naver.me/5vJwbWbo"},
-  {"id":"66343890","type":"bakery","name":"강릉빵다방","address":"강원 강릉시 남강초교1길 24 강릉빵다방","lng":128.9181146,"lat":37.7690079,"sourceUrl":"https://naver.me/xAfHUXux"},
-  {"id":"1169844332","type":"cafe","name":"스타벅스 강릉주문진점","address":"강원 강릉시 주문진읍 학교담길 32-8","lng":128.8315791,"lat":37.88113,"sourceUrl":"https://naver.me/GbDFwu8Y"}
+  {"id":"31670414","type":"restaurant","name":"속초항아리물회","address":"강원 속초시 해오름로188번길 11 1, 2, 3층","description":"속초해변 인근에서 물회와 해산물 메뉴를 둘러볼 수 있는 식당.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20240414_66%2F1713078846713mpzaG_JPEG%2FKakaoTalk_20240413_155600213.jpg","lng":128.6012141,"lat":38.1914896,"sourceUrl":"https://naver.me/xllLhrg9"},
+  {"id":"35308401","type":"restaurant","name":"아바이회국수","address":"강원 속초시 청호로 115-12 아바이회국수","description":"아바이마을 골목에서 회국수를 맛볼 수 있는 국수집.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20231225_270%2F1703515780044FrPgU_JPEG%2F1000001199.jpg","lng":128.5943544,"lat":38.1999116,"sourceUrl":"https://naver.me/GCJ0PreS"},
+  {"id":"11726650","type":"restaurant","name":"신다신","address":"강원 속초시 아바이마을길 22","description":"아바이마을의 순대와 순댓국 메뉴를 찾을 때 보기 좋은 곳.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20260121_163%2F17689480019056jCwB_JPEG%2F1000147949.jpg","lng":128.5940629,"lat":38.2028231,"sourceUrl":"https://naver.me/FqIEOYvs"},
+  {"id":"15093015","type":"restaurant","name":"완도회식당","address":"강원 속초시 먹거리4길 21","description":"속초에서 물회와 오징어 요리를 찾을 때 살펴볼 식당.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20150901_91%2F14410609133118wWrC_JPEG%2F166560554526714_0.jpeg","lng":128.573046,"lat":38.195643,"sourceUrl":"https://naver.me/xF4njJf3"},
+  {"id":"1382428237","type":"restaurant","name":"속초751샌드위치","address":"강원 속초시 교동로 75-1","description":"샌드위치와 음료를 가볍게 즐기기 좋은 속초 카페.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20250921_196%2F1758419059591dQTt5_GIF%2F1000053087.gif","lng":128.576724,"lat":38.2056225,"sourceUrl":"https://naver.me/FLERu2ll"},
+  {"id":"1574212659","type":"bakery","name":"도리스 파티세리","address":"강원 속초시 중앙로147번길 26 1층 도리스 파티세리","description":"에그타르트와 구움과자를 중심으로 둘러볼 수 있는 파티세리.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20260709_292%2F1783608116118O4sMN_JPEG%2F001.jpg","lng":128.5897934,"lat":38.2038641,"sourceUrl":"https://naver.me/5Z19xhp5"},
+  {"id":"1377461131","type":"bakery","name":"두메타르트","address":"강원 속초시 설악산로4번길 15 1층 두메","description":"타르트와 구움과자를 고르기 좋은 속초 베이커리.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20240216_121%2F1708083736816hrNqU_JPEG%2FD1AB6AB7-7287-4A9F-9877-AC5D07FABC5D.jpeg","lng":128.6073279,"lat":38.1649237,"sourceUrl":"https://naver.me/FRoUddae"},
+  {"id":"15081449","type":"restaurant","name":"동해막국수","address":"강원 양양군 현남면 동해대로 54 동해막국수","description":"막국수와 회무침을 함께 살펴볼 수 있는 양양 식당.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20210118_282%2F1610942572970tTMoN_JPEG%2FBQEXdEgejJe4f6RRUoAHOKOa.jpg","lng":128.8039381,"lat":37.9200661,"sourceUrl":"https://naver.me/x5GoZXtC"},
+  {"id":"1898517753","type":"restaurant","name":"동호해변 섭국","address":"강원 양양군 손양면 상운길 44-63","description":"동호해변 근처에서 섭국과 한식을 찾을 때 보는 곳.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20260407_105%2F1775529345377R7WJD_JPEG%2FDSC06132.JPG","lng":128.6874113,"lat":38.0430323,"sourceUrl":"https://naver.me/x9BNol8L"},
+  {"id":"1693762102","type":"restaurant","name":"서울양계","address":"강원 강릉시 창해로 366","description":"강릉에서 치킨과 닭강정 메뉴를 둘러볼 수 있는 식당.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20210315_11%2F1615742862668oBAml_JPEG%2F16g8QnboCChSRoW9Kgzcuh8D.jpg","lng":128.9170949,"lat":37.7953296,"sourceUrl":"https://naver.me/Gqf5V0JP"},
+  {"id":"15380605","type":"restaurant","name":"해미가","address":"강원 강릉시 솔올로 103 교동 1807-2 1층 해미가","description":"강릉에서 물회와 생선회 메뉴를 살펴볼 수 있는 식당.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20260305_243%2F1772692933512yux65_PNG%2F%25C7%25D8%25B9%25CC%25B0%25A14.png","lng":128.878939,"lat":37.7710568,"sourceUrl":"https://naver.me/5l2HpohR"},
+  {"id":"1220981140","type":"bakery","name":"정남미명과 강릉본점","address":"강원 강릉시 경강로 2668 1층 정남미명과","description":"강릉에서 선물용 디저트와 명과를 둘러보기 좋은 곳.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fnaverbooking-phinf.pstatic.net%2F20250507_162%2F1746592840220xkmD2_JPEG%2F%25C1%25A6%25C7%25B0-%25BB%25E7%25C1%25F81500x1500_10%25C1%25BE.jpg","lng":128.9502006,"lat":37.7705515,"sourceUrl":"https://naver.me/5vJwbWbo"},
+  {"id":"66343890","type":"bakery","name":"강릉빵다방","address":"강원 강릉시 남강초교1길 24 강릉빵다방","description":"강릉의 개성 있는 빵과 베이커리 메뉴를 살펴볼 곳.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20260116_245%2F1768565356517JSsYY_JPEG%2FIMG_9232.jpeg","lng":128.9181146,"lat":37.7690079,"sourceUrl":"https://naver.me/xAfHUXux"},
+  {"id":"1169844332","type":"cafe","name":"스타벅스 강릉주문진점","address":"강원 강릉시 주문진읍 학교담길 32-8","description":"주문진 바다 근처에서 잠시 쉬어 가기 좋은 카페.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20190828_93%2F1566953601239OT9MQ_PNG%2FxX7Wv642gXMoTI0DAv0hRymS.png","lng":128.8315791,"lat":37.88113,"sourceUrl":"https://naver.me/GbDFwu8Y"}
 ]
     </script>
     <script id="lodging-data" type="application/json">
-{"id":"1616363964","type":"lodging","name":"체스터톤스속초","address":"강원 속초시 엑스포로 109","lng":128.5800413,"lat":38.1943159,"sourceUrl":"https://m.place.naver.com/accommodation/1616363964/home"}
+{"id":"1616363964","type":"lodging","name":"체스터톤스속초","address":"강원 속초시 엑스포로 109","description":"속초 엑스포로에 잡은 여행 숙소이자 이동 기준점.","imageUrl":"https://search.pstatic.net/common/?autoRotate=true&quality=100&type=f640_380&src=https%3A%2F%2Fnaverbooking-phinf.pstatic.net%2F20241024_84%2F1729766202157N3Rdd_JPEG%2F%25C8%25A3%25C5%25DA%25C1%25A4%25B9%25AE_%25BF%25DC%25B0%25FC.jpg","lng":128.5800413,"lat":38.1943159,"sourceUrl":"https://m.place.naver.com/accommodation/1616363964/home"}
     </script>
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -751,8 +823,10 @@
         const placeList = document.getElementById("place-list");
         const selectedPlace = document.getElementById("selected-place");
         const selectedSymbol = document.getElementById("selected-symbol");
+        const selectedImage = document.getElementById("selected-image");
         const selectedKind = document.getElementById("selected-kind");
         const selectedName = document.getElementById("selected-name");
+        const selectedDescription = document.getElementById("selected-description");
         const selectedAddress = document.getElementById("selected-address");
         const selectedLink = document.getElementById("selected-link");
         const selectedRouteLink = document.getElementById("selected-route-link");
@@ -864,15 +938,23 @@
           window.setTimeout(() => map?.invalidateSize(), 280);
         }
 
+        function handleSelectedImageError() {
+          selectedImage.hidden = true;
+        }
+
         function updateSelectedPlace(place) {
           const category = CATEGORY_META[place.type];
           selectedId = place.id;
+          selectedImage.hidden = false;
+          selectedImage.src = place.imageUrl;
+          selectedImage.alt = `${place.name} 대표 사진`;
           selectedSymbol.textContent = category.symbol;
           selectedSymbol.classList.toggle("is-lodging", place.type === "lodging");
           selectedSymbol.setAttribute("aria-label", category.label);
           selectedKind.textContent = category.label;
           selectedKind.hidden = false;
           selectedName.textContent = place.name;
+          selectedDescription.textContent = place.description;
           selectedAddress.textContent = place.address;
           selectedLink.href = place.sourceUrl;
           selectedLink.setAttribute("aria-label", `${place.name} 네이버 지도에서 열기`);
@@ -965,7 +1047,7 @@
           currentLocationButton.classList.remove("is-locating");
           currentLocationButton.setAttribute("aria-busy", "false");
           currentLocationButton.setAttribute("aria-pressed", "true");
-          currentLocationButton.setAttribute("aria-label", "현재 위치로 이동");
+          currentLocationButton.setAttribute("aria-label", "현재 위치 표시 끄기");
           showLocationStatus("현재 위치를 표시했어요.");
 
           if (centerOnNextLocation) {
@@ -994,12 +1076,33 @@
           }
         }
 
-        function handleLocationError(error) {
+        function clearCurrentLocationLayers() {
+          if (map && userLocationMarker) {
+            map.removeLayer(userLocationMarker);
+          }
+          if (map && userAccuracyCircle) {
+            map.removeLayer(userAccuracyCircle);
+          }
+          userLocationMarker = null;
+          userAccuracyCircle = null;
+          currentPosition = null;
+        }
+
+        function disableCurrentLocation(showMessage = true) {
           stopLocationWatch();
+          clearCurrentLocationLayers();
           centerOnNextLocation = false;
           currentLocationButton.classList.remove("is-locating");
           currentLocationButton.setAttribute("aria-busy", "false");
           currentLocationButton.setAttribute("aria-pressed", "false");
+          currentLocationButton.setAttribute("aria-label", "현재 위치 표시");
+          if (showMessage) {
+            showLocationStatus("현재 위치 표시를 껐어요.");
+          }
+        }
+
+        function handleLocationError(error) {
+          disableCurrentLocation(false);
           currentLocationButton.setAttribute("aria-label", "현재 위치 다시 확인");
           showLocationStatus(getLocationErrorMessage(error), true);
         }
@@ -1017,6 +1120,7 @@
           centerOnNextLocation = true;
           currentLocationButton.classList.add("is-locating");
           currentLocationButton.setAttribute("aria-busy", "true");
+          currentLocationButton.setAttribute("aria-pressed", "true");
           currentLocationButton.setAttribute("aria-label", "현재 위치 확인 중");
           showLocationStatus("현재 위치를 확인하고 있어요.");
           locationWatchId = navigator.geolocation.watchPosition(
@@ -1032,7 +1136,7 @@
 
         function handleCurrentLocationClick() {
           if (locationWatchId !== null) {
-            moveMapToCurrentPosition();
+            disableCurrentLocation();
             return;
           }
           startLocationWatch();
@@ -1052,8 +1156,8 @@
           });
 
           const tiles = L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-            { maxZoom: 19 },
+            "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            { maxZoom: 20, subdomains: "abcd" },
           );
           tiles.on("tileerror", () => {
             mapWarning.hidden = false;
@@ -1071,8 +1175,8 @@
             const icon = L.divIcon({
               className: `category-marker${place.type === "lodging" ? " is-lodging" : ""}`,
               html: `<span class="category-pin"><b aria-hidden="true">${category.symbol}</b></span>`,
-              iconSize: [44, 52],
-              iconAnchor: [22, 49],
+              iconSize: [34, 40],
+              iconAnchor: [17, 37],
             });
             const marker = L.marker([place.lat, place.lng], {
               icon,
@@ -1087,6 +1191,7 @@
           updateSelectedPlace(lodging);
         }
 
+        selectedImage.addEventListener("error", handleSelectedImageError);
         buildPlaceList();
         updateSelectedPlace(lodging);
         setSheetExpanded(false);
@@ -1095,7 +1200,7 @@
         currentLocationButton.addEventListener("click", handleCurrentLocationClick);
         selectedRouteLink.addEventListener("click", handleNaverRouteClick);
         window.addEventListener("pagehide", () => {
-          stopLocationWatch();
+          disableCurrentLocation(false);
           clearNaverRouteFallback();
         });
         initializeMap();
