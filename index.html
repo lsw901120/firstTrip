@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#e8edf0" />
+    <meta
+      name="description"
+      content="속초·양양·강릉에서 함께 저장한 장소 14곳과 숙소를 한 지도에서 확인하세요."
+    />
+    <title>속초·양양·강릉 여행 링크</title>
+    <link rel="preconnect" href="https://tile.openstreetmap.org" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+          "Noto Sans KR", sans-serif;
+        color: #17242d;
+        background: #e8edf0;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        overflow: hidden;
+        background: #e8edf0;
+      }
+
+      button,
+      a {
+        font: inherit;
+      }
+
+      button {
+        color: inherit;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .travel-app {
+        position: relative;
+        width: min(100%, 540px);
+        height: 100svh;
+        min-height: 620px;
+        margin: 0 auto;
+        overflow: hidden;
+        background: #dce9ef;
+        box-shadow: 0 0 56px rgba(17, 34, 46, 0.18);
+      }
+
+      #map {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(circle at 70% 22%, rgba(255, 255, 255, 0.6), transparent 24%),
+          #dce9ef;
+      }
+
+      .map-header {
+        position: absolute;
+        z-index: 800;
+        top: max(14px, env(safe-area-inset-top));
+        left: 14px;
+        right: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 94px;
+        padding: 14px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.78);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 10px 32px rgba(27, 48, 62, 0.16);
+        backdrop-filter: blur(16px);
+      }
+
+      .header-copy {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .eyebrow {
+        margin: 0 0 5px;
+        color: #df4b66;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.17em;
+      }
+
+      .map-header h1 {
+        overflow: hidden;
+        margin: 0;
+        font-size: clamp(21px, 6.5vw, 27px);
+        line-height: 1.05;
+        letter-spacing: -0.045em;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .place-count {
+        margin: 6px 0 0;
+        color: #687983;
+        font-size: 12px;
+      }
+
+      .overview-button {
+        flex: 0 0 auto;
+        min-width: 72px;
+        min-height: 44px;
+        padding: 0 13px;
+        border: 0;
+        border-radius: 14px;
+        background: #17242d;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .overview-button:focus-visible,
+      .sheet-toggle:focus-visible,
+      .place-list-button:focus-visible,
+      .naver-link:focus-visible {
+        outline: 3px solid rgba(242, 90, 115, 0.42);
+        outline-offset: 2px;
+      }
+
+      .map-warning {
+        position: absolute;
+        z-index: 780;
+        top: calc(max(14px, env(safe-area-inset-top)) + 106px);
+        left: 14px;
+        right: 14px;
+        margin: 0;
+        padding: 11px 13px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.96);
+        color: #7d3341;
+        font-size: 12px;
+        line-height: 1.45;
+        box-shadow: 0 7px 20px rgba(27, 48, 62, 0.14);
+      }
+
+      .map-attribution {
+        position: absolute;
+        z-index: 700;
+        right: 10px;
+        bottom: calc(153px + env(safe-area-inset-bottom));
+        padding: 4px 7px;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.86);
+        color: #596a74;
+        font-size: 10px;
+        text-decoration: none;
+      }
+
+      .leaflet-control-zoom {
+        margin-right: 12px !important;
+        margin-bottom: calc(166px + env(safe-area-inset-bottom)) !important;
+        overflow: hidden;
+        border: 0 !important;
+        border-radius: 14px !important;
+        box-shadow: 0 6px 22px rgba(24, 43, 55, 0.19) !important;
+        transition: opacity 0.2s ease;
+      }
+
+      .leaflet-control-zoom a {
+        width: 40px !important;
+        height: 40px !important;
+        border: 0 !important;
+        color: #17242d !important;
+        font-weight: 500 !important;
+        line-height: 38px !important;
+      }
+
+      .sheet-open .leaflet-control-zoom {
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .numbered-marker {
+        border: 0 !important;
+        background: transparent !important;
+      }
+
+      .numbered-marker .pin-shape {
+        display: grid;
+        width: 40px;
+        height: 40px;
+        place-items: center;
+        border: 3px solid #fff;
+        border-radius: 50% 50% 50% 12px;
+        transform: rotate(-45deg);
+        background: #f25a73;
+        color: #fff;
+        box-shadow: 0 7px 18px rgba(120, 31, 50, 0.32);
+        transition:
+          transform 0.18s ease,
+          background 0.18s ease;
+      }
+
+      .numbered-marker b {
+        transform: rotate(45deg);
+        font-size: 13px;
+      }
+
+      .numbered-marker.is-selected {
+        z-index: 1000 !important;
+      }
+
+      .numbered-marker.is-selected .pin-shape {
+        transform: rotate(-45deg) scale(1.2);
+        background: #17242d;
+      }
+
+      .lodging-marker {
+        border: 0 !important;
+        background: transparent !important;
+      }
+
+      .lodging-marker .lodging-pin {
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border: 3px solid #fff;
+        border-radius: 50% 50% 50% 12px;
+        transform: rotate(-45deg);
+        background: #2476d3;
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(30, 87, 154, 0.36);
+        transition:
+          transform 0.18s ease,
+          background 0.18s ease;
+      }
+
+      .lodging-marker .lodging-pin b {
+        transform: rotate(45deg);
+        font-size: 22px;
+        line-height: 1;
+      }
+
+      .lodging-marker.is-selected {
+        z-index: 1000 !important;
+      }
+
+      .lodging-marker.is-selected .lodging-pin {
+        transform: rotate(-45deg) scale(1.2);
+        background: #164b87;
+      }
+
+      .place-sheet {
+        position: absolute;
+        z-index: 900;
+        left: 10px;
+        right: 10px;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.78);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 17px 44px rgba(22, 43, 57, 0.24);
+        backdrop-filter: blur(17px);
+        transition: max-height 0.26s ease;
+      }
+
+      .place-sheet.is-collapsed {
+        max-height: 146px;
+      }
+
+      .place-sheet.is-expanded {
+        max-height: min(70svh, 640px);
+      }
+
+      .sheet-toggle {
+        display: flex;
+        width: 100%;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 0;
+        background: transparent;
+        color: #657680;
+        font-size: 12px;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      .sheet-handle {
+        width: 34px;
+        height: 4px;
+        border-radius: 999px;
+        background: #d3dade;
+      }
+
+      .selected-place {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        gap: 11px;
+        min-height: 88px;
+        align-items: center;
+        padding: 1px 14px 16px;
+      }
+
+      .place-number {
+        display: grid;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 50%;
+        background: #f25a73;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .place-number.is-lodging {
+        background: #2476d3;
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .place-copy {
+        display: block;
+        min-width: 0;
+        text-align: left;
+      }
+
+      .place-copy strong {
+        display: block;
+        overflow: hidden;
+        font-size: 16px;
+        letter-spacing: -0.025em;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .place-kind {
+        display: inline-flex;
+        width: fit-content;
+        min-height: 20px;
+        align-items: center;
+        margin-bottom: 4px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: #e6f1ff;
+        color: #1d65b7;
+        font-size: 10px;
+        font-weight: 850;
+      }
+
+      .place-copy small {
+        display: block;
+        overflow: hidden;
+        margin-top: 5px;
+        color: #6b7b85;
+        font-size: 11px;
+        line-height: 1.35;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .naver-link {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+        border-radius: 13px;
+        background: #03c75a;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 850;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .place-list {
+        max-height: calc(min(70svh, 640px) - 44px);
+        margin: 0;
+        padding: 0 10px 16px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        list-style: none;
+      }
+
+      .place-list li + li {
+        border-top: 1px solid #edf0f2;
+      }
+
+      .place-list-button {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 10px;
+        width: 100%;
+        min-height: 66px;
+        align-items: center;
+        padding: 10px 5px;
+        border: 0;
+        border-radius: 14px;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .place-list-button:hover,
+      .place-list-button:focus-visible,
+      .place-list-button.is-selected {
+        background: #f2f5f6;
+      }
+
+      .place-list-button.is-selected .place-number {
+        background: #17242d;
+      }
+
+      .place-list-button.is-selected .place-number.is-lodging {
+        background: #164b87;
+      }
+
+      @media (max-width: 360px) {
+        .map-header {
+          top: max(8px, env(safe-area-inset-top));
+          left: 8px;
+          right: 8px;
+          min-height: 88px;
+          padding: 12px;
+        }
+
+        .overview-button {
+          min-width: 66px;
+          padding: 0 10px;
+        }
+
+        .place-sheet {
+          left: 6px;
+          right: 6px;
+          bottom: max(6px, env(safe-area-inset-bottom));
+        }
+
+        .place-sheet.is-collapsed {
+          max-height: 184px;
+        }
+
+        .selected-place {
+          grid-template-columns: 40px minmax(0, 1fr);
+          row-gap: 8px;
+        }
+
+        .naver-link {
+          grid-column: 1 / -1;
+        }
+
+        .map-attribution {
+          bottom: calc(190px + env(safe-area-inset-bottom));
+        }
+
+        .leaflet-control-zoom {
+          margin-bottom: calc(204px + env(safe-area-inset-bottom)) !important;
+        }
+      }
+
+      @media (min-width: 700px) {
+        body {
+          padding: 20px 0;
+        }
+
+        .travel-app {
+          height: min(920px, calc(100vh - 40px));
+          min-height: 700px;
+          border-radius: 32px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="travel-app">
+      <div id="map" aria-label="속초, 양양, 강릉의 저장한 장소 14곳과 숙소 지도"></div>
+
+      <header class="map-header">
+        <div class="header-copy">
+          <p class="eyebrow">TRAVEL LINK MAP</p>
+          <h1>속초·양양·강릉</h1>
+          <p class="place-count">공유받은 장소 14곳 · 숙소 1곳</p>
+        </div>
+        <button id="overview-button" class="overview-button" type="button">
+          전체 보기
+        </button>
+      </header>
+
+      <p id="map-warning" class="map-warning" role="status" hidden>
+        지도를 불러오지 못했어요. 아래 장소 목록과 네이버 원본 링크는 계속 사용할 수 있어요.
+      </p>
+
+      <a
+        class="map-attribution"
+        href="https://www.openstreetmap.org/copyright"
+        target="_blank"
+        rel="noreferrer"
+      >© OpenStreetMap</a>
+
+      <section id="place-sheet" class="place-sheet is-collapsed" aria-label="저장한 장소">
+        <button
+          id="sheet-toggle"
+          class="sheet-toggle"
+          type="button"
+          aria-controls="place-list"
+          aria-expanded="false"
+        >
+          <span class="sheet-handle" aria-hidden="true"></span>
+          <span id="sheet-toggle-label">15개 위치 보기</span>
+        </button>
+
+        <article id="selected-place" class="selected-place" aria-live="polite">
+          <span id="selected-number" class="place-number is-lodging" aria-label="숙소">⌂</span>
+          <span class="place-copy">
+            <span id="selected-kind" class="place-kind">숙소</span>
+            <strong id="selected-name">체스터톤스속초</strong>
+            <small id="selected-address">강원 속초시 엑스포로 109</small>
+          </span>
+          <a
+            id="selected-link"
+            class="naver-link"
+            href="https://m.place.naver.com/accommodation/1616363964/home"
+            target="_blank"
+            rel="noreferrer"
+          >네이버 지도에서 열기</a>
+        </article>
+
+        <ol id="place-list" class="place-list" hidden></ol>
+      </section>
+    </main>
+
+    <script id="place-data" type="application/json">
+[
+  {"id":"31670414","number":1,"name":"속초항아리물회","address":"강원 속초시 해오름로188번길 11 1, 2, 3층","lng":128.6012141,"lat":38.1914896,"sourceUrl":"https://naver.me/xllLhrg9"},
+  {"id":"35308401","number":2,"name":"아바이회국수","address":"강원 속초시 청호로 115-12 아바이회국수","lng":128.5943544,"lat":38.1999116,"sourceUrl":"https://naver.me/GCJ0PreS"},
+  {"id":"11726650","number":3,"name":"신다신","address":"강원 속초시 아바이마을길 22","lng":128.5940629,"lat":38.2028231,"sourceUrl":"https://naver.me/FqIEOYvs"},
+  {"id":"15093015","number":4,"name":"완도회식당","address":"강원 속초시 먹거리4길 21","lng":128.573046,"lat":38.195643,"sourceUrl":"https://naver.me/xF4njJf3"},
+  {"id":"1382428237","number":5,"name":"속초751샌드위치","address":"강원 속초시 교동로 75-1","lng":128.576724,"lat":38.2056225,"sourceUrl":"https://naver.me/FLERu2ll"},
+  {"id":"1574212659","number":6,"name":"도리스 파티세리","address":"강원 속초시 중앙로147번길 26 1층 도리스 파티세리","lng":128.5897934,"lat":38.2038641,"sourceUrl":"https://naver.me/5Z19xhp5"},
+  {"id":"1377461131","number":7,"name":"두메타르트","address":"강원 속초시 설악산로4번길 15 1층 두메","lng":128.6073279,"lat":38.1649237,"sourceUrl":"https://naver.me/FRoUddae"},
+  {"id":"15081449","number":8,"name":"동해막국수","address":"강원 양양군 현남면 동해대로 54 동해막국수","lng":128.8039381,"lat":37.9200661,"sourceUrl":"https://naver.me/x5GoZXtC"},
+  {"id":"1898517753","number":9,"name":"동호해변 섭국","address":"강원 양양군 손양면 상운길 44-63","lng":128.6874113,"lat":38.0430323,"sourceUrl":"https://naver.me/x9BNol8L"},
+  {"id":"1693762102","number":10,"name":"서울양계","address":"강원 강릉시 창해로 366","lng":128.9170949,"lat":37.7953296,"sourceUrl":"https://naver.me/Gqf5V0JP"},
+  {"id":"15380605","number":11,"name":"해미가","address":"강원 강릉시 솔올로 103 교동 1807-2 1층 해미가","lng":128.878939,"lat":37.7710568,"sourceUrl":"https://naver.me/5l2HpohR"},
+  {"id":"1220981140","number":12,"name":"정남미명과 강릉본점","address":"강원 강릉시 경강로 2668 1층 정남미명과","lng":128.9502006,"lat":37.7705515,"sourceUrl":"https://naver.me/5vJwbWbo"},
+  {"id":"66343890","number":13,"name":"강릉빵다방","address":"강원 강릉시 남강초교1길 24 강릉빵다방","lng":128.9181146,"lat":37.7690079,"sourceUrl":"https://naver.me/xAfHUXux"},
+  {"id":"1169844332","number":14,"name":"스타벅스 강릉주문진점","address":"강원 강릉시 주문진읍 학교담길 32-8","lng":128.8315791,"lat":37.88113,"sourceUrl":"https://naver.me/GbDFwu8Y"}
+]
+    </script>
+    <script id="lodging-data" type="application/json">
+{"id":"1616363964","type":"lodging","name":"체스터톤스속초","address":"강원 속초시 엑스포로 109","lng":128.5800413,"lat":38.1943159,"sourceUrl":"https://m.place.naver.com/accommodation/1616363964/home"}
+    </script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script>
+      (() => {
+        "use strict";
+
+        const places = JSON.parse(document.getElementById("place-data").textContent);
+        const lodging = JSON.parse(document.getElementById("lodging-data").textContent);
+        const locations = [lodging, ...places];
+        const placeById = new Map(locations.map((place) => [place.id, place]));
+        const markerById = new Map();
+        const listButtonById = new Map();
+        const mapWarning = document.getElementById("map-warning");
+        const placeSheet = document.getElementById("place-sheet");
+        const sheetToggle = document.getElementById("sheet-toggle");
+        const sheetToggleLabel = document.getElementById("sheet-toggle-label");
+        const placeList = document.getElementById("place-list");
+        const selectedPlace = document.getElementById("selected-place");
+        const selectedNumber = document.getElementById("selected-number");
+        const selectedKind = document.getElementById("selected-kind");
+        const selectedName = document.getElementById("selected-name");
+        const selectedAddress = document.getElementById("selected-address");
+        const selectedLink = document.getElementById("selected-link");
+        const overviewButton = document.getElementById("overview-button");
+        let selectedId = lodging.id;
+        let sheetExpanded = false;
+        let map = null;
+        let allBounds = null;
+
+        function buildPlaceList() {
+          for (const place of locations) {
+            const isLodging = place.type === "lodging";
+            const item = document.createElement("li");
+            const button = document.createElement("button");
+            const number = document.createElement("span");
+            const copy = document.createElement("span");
+            const name = document.createElement("strong");
+            const address = document.createElement("small");
+
+            button.type = "button";
+            button.className = "place-list-button";
+            button.dataset.placeId = place.id;
+            button.setAttribute(
+              "aria-label",
+              isLodging ? `숙소 ${place.name}` : `${place.number}번 ${place.name}`,
+            );
+            number.className = `place-number${isLodging ? " is-lodging" : ""}`;
+            number.textContent = isLodging ? "⌂" : place.number;
+            if (isLodging) number.setAttribute("aria-label", "숙소");
+            copy.className = "place-copy";
+            name.textContent = place.name;
+            address.textContent = place.address;
+            copy.append(name, address);
+            button.append(number, copy);
+            button.addEventListener("click", () => selectPlace(place.id, true));
+            item.append(button);
+            placeList.append(item);
+            listButtonById.set(place.id, button);
+          }
+        }
+
+        function setSheetExpanded(expanded) {
+          sheetExpanded = expanded;
+          placeSheet.classList.toggle("is-expanded", expanded);
+          placeSheet.classList.toggle("is-collapsed", !expanded);
+          placeList.hidden = !expanded;
+          selectedPlace.hidden = expanded;
+          sheetToggle.setAttribute("aria-expanded", String(expanded));
+          sheetToggleLabel.textContent = expanded ? "목록 닫기" : "15개 위치 보기";
+          document.body.classList.toggle("sheet-open", expanded);
+          window.setTimeout(() => map?.invalidateSize(), 280);
+        }
+
+        function updateSelectedPlace(place) {
+          const isLodging = place.type === "lodging";
+          selectedId = place.id;
+          selectedNumber.textContent = isLodging ? "⌂" : place.number;
+          selectedNumber.classList.toggle("is-lodging", isLodging);
+          selectedNumber.setAttribute("aria-label", isLodging ? "숙소" : `${place.number}번`);
+          selectedKind.hidden = !isLodging;
+          selectedName.textContent = place.name;
+          selectedAddress.textContent = place.address;
+          selectedLink.href = place.sourceUrl;
+          selectedLink.setAttribute("aria-label", `${place.name} 네이버 지도에서 열기`);
+
+          for (const [id, marker] of markerById) {
+            marker.getElement()?.classList.toggle("is-selected", id === selectedId);
+            marker.setZIndexOffset(id === selectedId ? 1000 : 0);
+          }
+          for (const [id, button] of listButtonById) {
+            button.classList.toggle("is-selected", id === selectedId);
+            button.setAttribute("aria-current", id === selectedId ? "true" : "false");
+          }
+        }
+
+        function selectPlace(placeId, moveMap) {
+          const place = placeById.get(placeId);
+          if (!place) return;
+          updateSelectedPlace(place);
+          setSheetExpanded(false);
+          if (moveMap && map) {
+            map.flyTo([place.lat, place.lng], Math.max(map.getZoom(), 14), {
+              animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+              duration: 0.65,
+            });
+          }
+        }
+
+        function fitAllPlaces() {
+          setSheetExpanded(false);
+          if (map && allBounds) {
+            map.fitBounds(allBounds, {
+              paddingTopLeft: [48, 135],
+              paddingBottomRight: [48, 178],
+            });
+          }
+        }
+
+        function initializeMap() {
+          if (typeof window.L === "undefined") {
+            mapWarning.hidden = false;
+            return;
+          }
+
+          map = L.map("map", {
+            zoomControl: false,
+            attributionControl: false,
+            minZoom: 6,
+            maxZoom: 18,
+          });
+
+          const tiles = L.tileLayer(
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            { maxZoom: 19 },
+          );
+          tiles.on("tileerror", () => {
+            mapWarning.hidden = false;
+          });
+          tiles.on("load", () => {
+            mapWarning.hidden = true;
+          });
+          tiles.addTo(map);
+          L.control.zoom({ position: "bottomright" }).addTo(map);
+
+          allBounds = L.latLngBounds(locations.map((place) => [place.lat, place.lng]));
+
+          for (const place of locations) {
+            const isLodging = place.type === "lodging";
+            const icon = isLodging
+              ? L.divIcon({
+                  className: "lodging-marker",
+                  html: `<span class="lodging-pin"><b aria-hidden="true">⌂</b></span>`,
+                  iconSize: [46, 54],
+                  iconAnchor: [23, 51],
+                })
+              : L.divIcon({
+                  className: "numbered-marker",
+                  html: `<span class="pin-shape"><b>${place.number}</b></span>`,
+                  iconSize: [42, 50],
+                  iconAnchor: [21, 47],
+                });
+            const marker = L.marker([place.lat, place.lng], {
+              icon,
+              title: place.name,
+              keyboard: true,
+            }).addTo(map);
+            marker.on("click", () => selectPlace(place.id, false));
+            markerById.set(place.id, marker);
+          }
+
+          fitAllPlaces();
+          updateSelectedPlace(lodging);
+        }
+
+        buildPlaceList();
+        updateSelectedPlace(lodging);
+        setSheetExpanded(false);
+        sheetToggle.addEventListener("click", () => setSheetExpanded(!sheetExpanded));
+        overviewButton.addEventListener("click", fitAllPlaces);
+        initializeMap();
+      })();
+    </script>
+  </body>
+</html>
