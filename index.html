@@ -198,20 +198,20 @@
         opacity: 0;
       }
 
-      .numbered-marker {
+      .category-marker {
         border: 0 !important;
         background: transparent !important;
       }
 
-      .numbered-marker .pin-shape {
+      .category-marker .category-pin {
         display: grid;
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         place-items: center;
         border: 3px solid #fff;
         border-radius: 50% 50% 50% 12px;
         transform: rotate(-45deg);
-        background: #f25a73;
+        background: #e9516c;
         color: #fff;
         box-shadow: 0 7px 18px rgba(120, 31, 50, 0.32);
         transition:
@@ -219,54 +219,18 @@
           background 0.18s ease;
       }
 
-      .numbered-marker b {
+      .category-marker .category-pin b {
         transform: rotate(45deg);
         font-size: 13px;
       }
 
-      .numbered-marker.is-selected {
+      .category-marker.is-selected {
         z-index: 1000 !important;
       }
 
-      .numbered-marker.is-selected .pin-shape {
+      .category-marker.is-selected .category-pin {
         transform: rotate(-45deg) scale(1.2);
         background: #17242d;
-      }
-
-      .lodging-marker {
-        border: 0 !important;
-        background: transparent !important;
-      }
-
-      .lodging-marker .lodging-pin {
-        display: grid;
-        width: 44px;
-        height: 44px;
-        place-items: center;
-        border: 3px solid #fff;
-        border-radius: 50% 50% 50% 12px;
-        transform: rotate(-45deg);
-        background: #2476d3;
-        color: #fff;
-        box-shadow: 0 8px 20px rgba(30, 87, 154, 0.36);
-        transition:
-          transform 0.18s ease,
-          background 0.18s ease;
-      }
-
-      .lodging-marker .lodging-pin b {
-        transform: rotate(45deg);
-        font-size: 22px;
-        line-height: 1;
-      }
-
-      .lodging-marker.is-selected {
-        z-index: 1000 !important;
-      }
-
-      .lodging-marker.is-selected .lodging-pin {
-        transform: rotate(-45deg) scale(1.2);
-        background: #164b87;
       }
 
       .place-sheet {
@@ -323,23 +287,17 @@
         padding: 1px 14px 16px;
       }
 
-      .place-number {
+      .place-symbol {
         display: grid;
         width: 40px;
         height: 40px;
         flex: 0 0 auto;
         place-items: center;
         border-radius: 50%;
-        background: #f25a73;
+        background: #e9516c;
         color: #fff;
         font-size: 13px;
         font-weight: 850;
-      }
-
-      .place-number.is-lodging {
-        background: #2476d3;
-        font-size: 20px;
-        line-height: 1;
       }
 
       .place-copy {
@@ -365,8 +323,8 @@
         margin-bottom: 4px;
         padding: 0 7px;
         border-radius: 999px;
-        background: #e6f1ff;
-        color: #1d65b7;
+        background: #fff0f3;
+        color: #b53850;
         font-size: 10px;
         font-weight: 850;
       }
@@ -430,12 +388,8 @@
         background: #f2f5f6;
       }
 
-      .place-list-button.is-selected .place-number {
+      .place-list-button.is-selected .place-symbol {
         background: #17242d;
-      }
-
-      .place-list-button.is-selected .place-number.is-lodging {
-        background: #164b87;
       }
 
       @media (max-width: 360px) {
@@ -510,7 +464,7 @@
         <div class="header-copy">
           <p class="eyebrow">TRAVEL LINK MAP</p>
           <h1>속초·양양·강릉</h1>
-          <p class="place-count">공유받은 장소 14곳 · 숙소 1곳</p>
+          <p class="place-count">저장한 위치 15곳</p>
         </div>
         <button id="overview-button" class="overview-button" type="button">
           전체 보기
@@ -541,7 +495,7 @@
         </button>
 
         <article id="selected-place" class="selected-place" aria-live="polite">
-          <span id="selected-number" class="place-number is-lodging" aria-label="숙소">⌂</span>
+          <span id="selected-symbol" class="place-symbol" aria-label="숙소">숙</span>
           <span class="place-copy">
             <span id="selected-kind" class="place-kind">숙소</span>
             <strong id="selected-name">체스터톤스속초</strong>
@@ -562,20 +516,20 @@
 
     <script id="place-data" type="application/json">
 [
-  {"id":"31670414","number":1,"name":"속초항아리물회","address":"강원 속초시 해오름로188번길 11 1, 2, 3층","lng":128.6012141,"lat":38.1914896,"sourceUrl":"https://naver.me/xllLhrg9"},
-  {"id":"35308401","number":2,"name":"아바이회국수","address":"강원 속초시 청호로 115-12 아바이회국수","lng":128.5943544,"lat":38.1999116,"sourceUrl":"https://naver.me/GCJ0PreS"},
-  {"id":"11726650","number":3,"name":"신다신","address":"강원 속초시 아바이마을길 22","lng":128.5940629,"lat":38.2028231,"sourceUrl":"https://naver.me/FqIEOYvs"},
-  {"id":"15093015","number":4,"name":"완도회식당","address":"강원 속초시 먹거리4길 21","lng":128.573046,"lat":38.195643,"sourceUrl":"https://naver.me/xF4njJf3"},
-  {"id":"1382428237","number":5,"name":"속초751샌드위치","address":"강원 속초시 교동로 75-1","lng":128.576724,"lat":38.2056225,"sourceUrl":"https://naver.me/FLERu2ll"},
-  {"id":"1574212659","number":6,"name":"도리스 파티세리","address":"강원 속초시 중앙로147번길 26 1층 도리스 파티세리","lng":128.5897934,"lat":38.2038641,"sourceUrl":"https://naver.me/5Z19xhp5"},
-  {"id":"1377461131","number":7,"name":"두메타르트","address":"강원 속초시 설악산로4번길 15 1층 두메","lng":128.6073279,"lat":38.1649237,"sourceUrl":"https://naver.me/FRoUddae"},
-  {"id":"15081449","number":8,"name":"동해막국수","address":"강원 양양군 현남면 동해대로 54 동해막국수","lng":128.8039381,"lat":37.9200661,"sourceUrl":"https://naver.me/x5GoZXtC"},
-  {"id":"1898517753","number":9,"name":"동호해변 섭국","address":"강원 양양군 손양면 상운길 44-63","lng":128.6874113,"lat":38.0430323,"sourceUrl":"https://naver.me/x9BNol8L"},
-  {"id":"1693762102","number":10,"name":"서울양계","address":"강원 강릉시 창해로 366","lng":128.9170949,"lat":37.7953296,"sourceUrl":"https://naver.me/Gqf5V0JP"},
-  {"id":"15380605","number":11,"name":"해미가","address":"강원 강릉시 솔올로 103 교동 1807-2 1층 해미가","lng":128.878939,"lat":37.7710568,"sourceUrl":"https://naver.me/5l2HpohR"},
-  {"id":"1220981140","number":12,"name":"정남미명과 강릉본점","address":"강원 강릉시 경강로 2668 1층 정남미명과","lng":128.9502006,"lat":37.7705515,"sourceUrl":"https://naver.me/5vJwbWbo"},
-  {"id":"66343890","number":13,"name":"강릉빵다방","address":"강원 강릉시 남강초교1길 24 강릉빵다방","lng":128.9181146,"lat":37.7690079,"sourceUrl":"https://naver.me/xAfHUXux"},
-  {"id":"1169844332","number":14,"name":"스타벅스 강릉주문진점","address":"강원 강릉시 주문진읍 학교담길 32-8","lng":128.8315791,"lat":37.88113,"sourceUrl":"https://naver.me/GbDFwu8Y"}
+  {"id":"31670414","type":"restaurant","name":"속초항아리물회","address":"강원 속초시 해오름로188번길 11 1, 2, 3층","lng":128.6012141,"lat":38.1914896,"sourceUrl":"https://naver.me/xllLhrg9"},
+  {"id":"35308401","type":"restaurant","name":"아바이회국수","address":"강원 속초시 청호로 115-12 아바이회국수","lng":128.5943544,"lat":38.1999116,"sourceUrl":"https://naver.me/GCJ0PreS"},
+  {"id":"11726650","type":"restaurant","name":"신다신","address":"강원 속초시 아바이마을길 22","lng":128.5940629,"lat":38.2028231,"sourceUrl":"https://naver.me/FqIEOYvs"},
+  {"id":"15093015","type":"restaurant","name":"완도회식당","address":"강원 속초시 먹거리4길 21","lng":128.573046,"lat":38.195643,"sourceUrl":"https://naver.me/xF4njJf3"},
+  {"id":"1382428237","type":"restaurant","name":"속초751샌드위치","address":"강원 속초시 교동로 75-1","lng":128.576724,"lat":38.2056225,"sourceUrl":"https://naver.me/FLERu2ll"},
+  {"id":"1574212659","type":"bakery","name":"도리스 파티세리","address":"강원 속초시 중앙로147번길 26 1층 도리스 파티세리","lng":128.5897934,"lat":38.2038641,"sourceUrl":"https://naver.me/5Z19xhp5"},
+  {"id":"1377461131","type":"bakery","name":"두메타르트","address":"강원 속초시 설악산로4번길 15 1층 두메","lng":128.6073279,"lat":38.1649237,"sourceUrl":"https://naver.me/FRoUddae"},
+  {"id":"15081449","type":"restaurant","name":"동해막국수","address":"강원 양양군 현남면 동해대로 54 동해막국수","lng":128.8039381,"lat":37.9200661,"sourceUrl":"https://naver.me/x5GoZXtC"},
+  {"id":"1898517753","type":"restaurant","name":"동호해변 섭국","address":"강원 양양군 손양면 상운길 44-63","lng":128.6874113,"lat":38.0430323,"sourceUrl":"https://naver.me/x9BNol8L"},
+  {"id":"1693762102","type":"restaurant","name":"서울양계","address":"강원 강릉시 창해로 366","lng":128.9170949,"lat":37.7953296,"sourceUrl":"https://naver.me/Gqf5V0JP"},
+  {"id":"15380605","type":"restaurant","name":"해미가","address":"강원 강릉시 솔올로 103 교동 1807-2 1층 해미가","lng":128.878939,"lat":37.7710568,"sourceUrl":"https://naver.me/5l2HpohR"},
+  {"id":"1220981140","type":"bakery","name":"정남미명과 강릉본점","address":"강원 강릉시 경강로 2668 1층 정남미명과","lng":128.9502006,"lat":37.7705515,"sourceUrl":"https://naver.me/5vJwbWbo"},
+  {"id":"66343890","type":"bakery","name":"강릉빵다방","address":"강원 강릉시 남강초교1길 24 강릉빵다방","lng":128.9181146,"lat":37.7690079,"sourceUrl":"https://naver.me/xAfHUXux"},
+  {"id":"1169844332","type":"cafe","name":"스타벅스 강릉주문진점","address":"강원 강릉시 주문진읍 학교담길 32-8","lng":128.8315791,"lat":37.88113,"sourceUrl":"https://naver.me/GbDFwu8Y"}
 ]
     </script>
     <script id="lodging-data" type="application/json">
@@ -593,6 +547,12 @@
         const places = JSON.parse(document.getElementById("place-data").textContent);
         const lodging = JSON.parse(document.getElementById("lodging-data").textContent);
         const locations = [lodging, ...places];
+        const CATEGORY_META = Object.freeze({
+          restaurant: { symbol: "식", label: "맛집" },
+          cafe: { symbol: "카", label: "카페" },
+          bakery: { symbol: "빵", label: "빵·디저트" },
+          lodging: { symbol: "숙", label: "숙소" },
+        });
         const placeById = new Map(locations.map((place) => [place.id, place]));
         const markerById = new Map();
         const listButtonById = new Map();
@@ -602,7 +562,7 @@
         const sheetToggleLabel = document.getElementById("sheet-toggle-label");
         const placeList = document.getElementById("place-list");
         const selectedPlace = document.getElementById("selected-place");
-        const selectedNumber = document.getElementById("selected-number");
+        const selectedSymbol = document.getElementById("selected-symbol");
         const selectedKind = document.getElementById("selected-kind");
         const selectedName = document.getElementById("selected-name");
         const selectedAddress = document.getElementById("selected-address");
@@ -615,10 +575,10 @@
 
         function buildPlaceList() {
           for (const place of locations) {
-            const isLodging = place.type === "lodging";
+            const category = CATEGORY_META[place.type];
             const item = document.createElement("li");
             const button = document.createElement("button");
-            const number = document.createElement("span");
+            const symbol = document.createElement("span");
             const copy = document.createElement("span");
             const name = document.createElement("strong");
             const address = document.createElement("small");
@@ -626,18 +586,15 @@
             button.type = "button";
             button.className = "place-list-button";
             button.dataset.placeId = place.id;
-            button.setAttribute(
-              "aria-label",
-              isLodging ? `숙소 ${place.name}` : `${place.number}번 ${place.name}`,
-            );
-            number.className = `place-number${isLodging ? " is-lodging" : ""}`;
-            number.textContent = isLodging ? "⌂" : place.number;
-            if (isLodging) number.setAttribute("aria-label", "숙소");
+            button.setAttribute("aria-label", `${category.label} ${place.name}`);
+            symbol.className = "place-symbol";
+            symbol.textContent = category.symbol;
+            symbol.setAttribute("aria-label", category.label);
             copy.className = "place-copy";
             name.textContent = place.name;
             address.textContent = place.address;
             copy.append(name, address);
-            button.append(number, copy);
+            button.append(symbol, copy);
             button.addEventListener("click", () => selectPlace(place.id, true));
             item.append(button);
             placeList.append(item);
@@ -658,12 +615,12 @@
         }
 
         function updateSelectedPlace(place) {
-          const isLodging = place.type === "lodging";
+          const category = CATEGORY_META[place.type];
           selectedId = place.id;
-          selectedNumber.textContent = isLodging ? "⌂" : place.number;
-          selectedNumber.classList.toggle("is-lodging", isLodging);
-          selectedNumber.setAttribute("aria-label", isLodging ? "숙소" : `${place.number}번`);
-          selectedKind.hidden = !isLodging;
+          selectedSymbol.textContent = category.symbol;
+          selectedSymbol.setAttribute("aria-label", category.label);
+          selectedKind.textContent = category.label;
+          selectedKind.hidden = false;
           selectedName.textContent = place.name;
           selectedAddress.textContent = place.address;
           selectedLink.href = place.sourceUrl;
@@ -731,20 +688,13 @@
           allBounds = L.latLngBounds(locations.map((place) => [place.lat, place.lng]));
 
           for (const place of locations) {
-            const isLodging = place.type === "lodging";
-            const icon = isLodging
-              ? L.divIcon({
-                  className: "lodging-marker",
-                  html: `<span class="lodging-pin"><b aria-hidden="true">⌂</b></span>`,
-                  iconSize: [46, 54],
-                  iconAnchor: [23, 51],
-                })
-              : L.divIcon({
-                  className: "numbered-marker",
-                  html: `<span class="pin-shape"><b>${place.number}</b></span>`,
-                  iconSize: [42, 50],
-                  iconAnchor: [21, 47],
-                });
+            const category = CATEGORY_META[place.type];
+            const icon = L.divIcon({
+              className: "category-marker",
+              html: `<span class="category-pin"><b aria-hidden="true">${category.symbol}</b></span>`,
+              iconSize: [44, 52],
+              iconAnchor: [22, 49],
+            });
             const marker = L.marker([place.lat, place.lng], {
               icon,
               title: place.name,
