@@ -140,7 +140,8 @@
       .current-location-button:focus-visible,
       .sheet-toggle:focus-visible,
       .place-list-button:focus-visible,
-      .naver-link:focus-visible {
+      .naver-link:focus-visible,
+      .naver-route-link:focus-visible {
         outline: 3px solid rgba(242, 90, 115, 0.42);
         outline-offset: 2px;
       }
@@ -419,19 +420,32 @@
         white-space: nowrap;
       }
 
-      .naver-link {
+      .place-actions {
+        display: grid;
+        min-width: 104px;
+        gap: 6px;
+      }
+
+      .place-action {
         display: inline-flex;
-        min-height: 42px;
+        min-height: 38px;
         align-items: center;
         justify-content: center;
-        padding: 0 12px;
-        border-radius: 13px;
-        background: #03c75a;
+        padding: 0 11px;
+        border-radius: 12px;
         color: #fff;
         font-size: 11px;
         font-weight: 850;
         text-decoration: none;
         white-space: nowrap;
+      }
+
+      .naver-link {
+        background: #03c75a;
+      }
+
+      .naver-route-link {
+        background: #17242d;
       }
 
       .place-list {
@@ -500,8 +514,9 @@
           row-gap: 8px;
         }
 
-        .naver-link {
+        .place-actions {
           grid-column: 1 / -1;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .map-attribution {
@@ -599,13 +614,20 @@
             <strong id="selected-name">체스터톤스속초</strong>
             <small id="selected-address">강원 속초시 엑스포로 109</small>
           </span>
-          <a
-            id="selected-link"
-            class="naver-link"
-            href="https://m.place.naver.com/accommodation/1616363964/home"
-            target="_blank"
-            rel="noreferrer"
-          >네이버 지도에서 열기</a>
+          <span class="place-actions">
+            <a
+              id="selected-link"
+              class="place-action naver-link"
+              href="https://m.place.naver.com/accommodation/1616363964/home"
+              target="_blank"
+              rel="noreferrer"
+            >장소 보기</a>
+            <a
+              id="selected-route-link"
+              class="place-action naver-route-link"
+              href="nmap://route/car"
+            >자동차 길찾기</a>
+          </span>
         </article>
 
         <ol id="place-list" class="place-list" hidden></ol>
@@ -665,6 +687,7 @@
         const selectedName = document.getElementById("selected-name");
         const selectedAddress = document.getElementById("selected-address");
         const selectedLink = document.getElementById("selected-link");
+        const selectedRouteLink = document.getElementById("selected-route-link");
         const overviewButton = document.getElementById("overview-button");
         const currentLocationButton = document.getElementById("current-location-button");
         const locationStatus = document.getElementById("location-status");
@@ -678,6 +701,55 @@
         let userAccuracyCircle = null;
         let centerOnNextLocation = false;
         let locationStatusTimer = null;
+        let naverRouteFallbackTimer = null;
+        let routeVisibilityHandler = null;
+
+        function buildNaverCarRouteUrl(place) {
+          const params = new URLSearchParams({
+            dlat: String(place.lat),
+            dlng: String(place.lng),
+            dname: place.name,
+            appname: `${window.location.origin}${window.location.pathname}`,
+          });
+          return `nmap://route/car?${params.toString()}`;
+        }
+
+        function clearNaverRouteFallback() {
+          window.clearTimeout(naverRouteFallbackTimer);
+          naverRouteFallbackTimer = null;
+          if (routeVisibilityHandler) {
+            document.removeEventListener("visibilitychange", routeVisibilityHandler);
+            routeVisibilityHandler = null;
+          }
+        }
+
+        function handleNaverRouteClick(event) {
+          event.preventDefault();
+          const place = placeById.get(selectedId);
+          if (!place) return;
+
+          clearNaverRouteFallback();
+          let appOpened = false;
+          routeVisibilityHandler = () => {
+            if (document.hidden) appOpened = true;
+          };
+          document.addEventListener("visibilitychange", routeVisibilityHandler);
+
+          try {
+            window.location.href = buildNaverCarRouteUrl(place);
+          } catch {
+            clearNaverRouteFallback();
+            window.location.assign(place.sourceUrl);
+            return;
+          }
+
+          naverRouteFallbackTimer = window.setTimeout(() => {
+            clearNaverRouteFallback();
+            if (!appOpened && !document.hidden) {
+              window.location.assign(place.sourceUrl);
+            }
+          }, 1500);
+        }
 
         function buildPlaceList() {
           for (const place of locations) {
@@ -731,6 +803,8 @@
           selectedAddress.textContent = place.address;
           selectedLink.href = place.sourceUrl;
           selectedLink.setAttribute("aria-label", `${place.name} 네이버 지도에서 열기`);
+          selectedRouteLink.href = buildNaverCarRouteUrl(place);
+          selectedRouteLink.setAttribute("aria-label", `${place.name}까지 자동차 길찾기`);
 
           for (const [id, marker] of markerById) {
             marker.getElement()?.classList.toggle("is-selected", id === selectedId);
@@ -946,7 +1020,11 @@
         sheetToggle.addEventListener("click", () => setSheetExpanded(!sheetExpanded));
         overviewButton.addEventListener("click", fitAllPlaces);
         currentLocationButton.addEventListener("click", handleCurrentLocationClick);
-        window.addEventListener("pagehide", stopLocationWatch);
+        selectedRouteLink.addEventListener("click", handleNaverRouteClick);
+        window.addEventListener("pagehide", () => {
+          stopLocationWatch();
+          clearNaverRouteFallback();
+        });
         initializeMap();
       })();
     </script>
