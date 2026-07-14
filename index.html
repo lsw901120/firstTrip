@@ -137,6 +137,7 @@
       }
 
       .overview-button:focus-visible,
+      .current-location-button:focus-visible,
       .sheet-toggle:focus-visible,
       .place-list-button:focus-visible,
       .naver-link:focus-visible {
@@ -159,6 +160,84 @@
         font-size: 12px;
         line-height: 1.45;
         box-shadow: 0 7px 20px rgba(27, 48, 62, 0.14);
+      }
+
+      .current-location-button {
+        position: absolute;
+        z-index: 790;
+        left: 12px;
+        bottom: calc(166px + env(safe-area-inset-bottom));
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        gap: 7px;
+        padding: 0 13px;
+        border: 0;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.96);
+        color: #17242d;
+        font-size: 12px;
+        font-weight: 850;
+        box-shadow: 0 6px 22px rgba(24, 43, 55, 0.19);
+        cursor: pointer;
+        transition:
+          opacity 0.2s ease,
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .current-location-button[aria-pressed="true"] {
+        background: #2483e2;
+        color: #fff;
+      }
+
+      .current-location-button[aria-busy="true"] .location-icon {
+        animation: location-pulse 0.9s ease-in-out infinite alternate;
+      }
+
+      .location-icon {
+        font-size: 19px;
+        line-height: 1;
+      }
+
+      .location-status {
+        position: absolute;
+        z-index: 795;
+        left: 12px;
+        bottom: calc(218px + env(safe-area-inset-bottom));
+        max-width: calc(100% - 24px);
+        margin: 0;
+        padding: 9px 11px;
+        border: 1px solid rgba(255, 255, 255, 0.82);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.97);
+        color: #315366;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.4;
+        box-shadow: 0 6px 20px rgba(24, 43, 55, 0.16);
+      }
+
+      .location-status.is-error {
+        color: #9d3046;
+      }
+
+      .sheet-open .current-location-button,
+      .sheet-open .location-status {
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      @keyframes location-pulse {
+        from {
+          opacity: 0.4;
+          transform: scale(0.86);
+        }
+
+        to {
+          opacity: 1;
+          transform: scale(1.08);
+        }
       }
 
       .map-attribution {
@@ -458,7 +537,7 @@
   </head>
   <body>
     <main class="travel-app">
-      <div id="map" aria-label="속초, 양양, 강릉의 저장한 장소 14곳과 숙소 지도"></div>
+      <div id="map" aria-label="속초, 양양, 강릉의 저장한 장소 14곳과 숙소 및 현재 위치 지도"></div>
 
       <header class="map-header">
         <div class="header-copy">
@@ -474,6 +553,25 @@
       <p id="map-warning" class="map-warning" role="status" hidden>
         지도를 불러오지 못했어요. 아래 장소 목록과 네이버 원본 링크는 계속 사용할 수 있어요.
       </p>
+
+      <button
+        id="current-location-button"
+        class="current-location-button"
+        type="button"
+        aria-label="현재 위치 표시"
+        aria-pressed="false"
+      >
+        <span class="location-icon" aria-hidden="true">◎</span>
+        <span>내 위치</span>
+      </button>
+
+      <p
+        id="location-status"
+        class="location-status"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></p>
 
       <a
         class="map-attribution"
@@ -568,10 +666,18 @@
         const selectedAddress = document.getElementById("selected-address");
         const selectedLink = document.getElementById("selected-link");
         const overviewButton = document.getElementById("overview-button");
+        const currentLocationButton = document.getElementById("current-location-button");
+        const locationStatus = document.getElementById("location-status");
         let selectedId = lodging.id;
         let sheetExpanded = false;
         let map = null;
         let allBounds = null;
+        let locationWatchId = null;
+        let currentPosition = null;
+        let userLocationMarker = null;
+        let userAccuracyCircle = null;
+        let centerOnNextLocation = false;
+        let locationStatusTimer = null;
 
         function buildPlaceList() {
           for (const place of locations) {
@@ -659,6 +765,132 @@
           }
         }
 
+        function showLocationStatus(message, isError = false) {
+          window.clearTimeout(locationStatusTimer);
+          locationStatus.textContent = message;
+          locationStatus.classList.toggle("is-error", isError);
+          locationStatus.hidden = false;
+          locationStatusTimer = window.setTimeout(() => {
+            locationStatus.hidden = true;
+          }, 4500);
+        }
+
+        function moveMapToCurrentPosition() {
+          if (!map || !currentPosition) return;
+          map.flyTo(currentPosition, Math.max(map.getZoom(), 15), {
+            animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+            duration: 0.65,
+          });
+        }
+
+        function updateCurrentPosition(position) {
+          if (!map) return;
+          const latLng = [position.coords.latitude, position.coords.longitude];
+          currentPosition = latLng;
+
+          if (userAccuracyCircle) {
+            userAccuracyCircle.setLatLng(latLng);
+            userAccuracyCircle.setRadius(position.coords.accuracy);
+          } else {
+            userAccuracyCircle = L.circle(latLng, {
+              radius: position.coords.accuracy,
+              color: "#2483e2",
+              fillColor: "#6eb6ff",
+              fillOpacity: 0.13,
+              weight: 1,
+            }).addTo(map);
+          }
+
+          if (userLocationMarker) {
+            userLocationMarker.setLatLng(latLng);
+          } else {
+            userLocationMarker = L.circleMarker(latLng, {
+              radius: 8,
+              color: "#ffffff",
+              fillColor: "#2483e2",
+              fillOpacity: 1,
+              weight: 3,
+            })
+              .bindTooltip("내 위치", { direction: "top" })
+              .addTo(map);
+          }
+
+          currentLocationButton.classList.remove("is-locating");
+          currentLocationButton.setAttribute("aria-busy", "false");
+          currentLocationButton.setAttribute("aria-pressed", "true");
+          currentLocationButton.setAttribute("aria-label", "현재 위치로 이동");
+          showLocationStatus("현재 위치를 표시했어요.");
+
+          if (centerOnNextLocation) {
+            centerOnNextLocation = false;
+            moveMapToCurrentPosition();
+          }
+        }
+
+        function getLocationErrorMessage(error) {
+          switch (error.code) {
+            case 1:
+              return "위치 권한이 거부되었어요. 브라우저 설정에서 위치 권한을 허용해주세요.";
+            case 2:
+              return "현재 위치를 확인하지 못했어요. 잠시 후 다시 시도해주세요.";
+            case 3:
+              return "위치를 확인하는 데 시간이 오래 걸리고 있어요. 다시 시도해주세요.";
+            default:
+              return "현재 위치를 확인하지 못했어요.";
+          }
+        }
+
+        function stopLocationWatch() {
+          if (locationWatchId !== null && navigator.geolocation) {
+            navigator.geolocation.clearWatch(locationWatchId);
+            locationWatchId = null;
+          }
+        }
+
+        function handleLocationError(error) {
+          stopLocationWatch();
+          centerOnNextLocation = false;
+          currentLocationButton.classList.remove("is-locating");
+          currentLocationButton.setAttribute("aria-busy", "false");
+          currentLocationButton.setAttribute("aria-pressed", "false");
+          currentLocationButton.setAttribute("aria-label", "현재 위치 다시 확인");
+          showLocationStatus(getLocationErrorMessage(error), true);
+        }
+
+        function startLocationWatch() {
+          if (!map) {
+            showLocationStatus("지도를 불러온 뒤 현재 위치를 확인할 수 있어요.", true);
+            return;
+          }
+          if (!navigator.geolocation) {
+            showLocationStatus("현재 위치를 확인할 수 없는 브라우저예요.", true);
+            return;
+          }
+
+          centerOnNextLocation = true;
+          currentLocationButton.classList.add("is-locating");
+          currentLocationButton.setAttribute("aria-busy", "true");
+          currentLocationButton.setAttribute("aria-label", "현재 위치 확인 중");
+          showLocationStatus("현재 위치를 확인하고 있어요.");
+          locationWatchId = navigator.geolocation.watchPosition(
+            updateCurrentPosition,
+            handleLocationError,
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 5000,
+            },
+          );
+        }
+
+        function handleCurrentLocationClick() {
+          if (locationWatchId !== null) {
+            moveMapToCurrentPosition();
+            return;
+          }
+          startLocationWatch();
+        }
+
         function initializeMap() {
           if (typeof window.L === "undefined") {
             mapWarning.hidden = false;
@@ -713,6 +945,8 @@
         setSheetExpanded(false);
         sheetToggle.addEventListener("click", () => setSheetExpanded(!sheetExpanded));
         overviewButton.addEventListener("click", fitAllPlaces);
+        currentLocationButton.addEventListener("click", handleCurrentLocationClick);
+        window.addEventListener("pagehide", stopLocationWatch);
         initializeMap();
       })();
     </script>
