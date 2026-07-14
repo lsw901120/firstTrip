@@ -299,6 +299,11 @@
           background 0.18s ease;
       }
 
+      .category-marker.is-lodging .category-pin {
+        background: #2483e2;
+        box-shadow: 0 7px 18px rgba(23, 99, 160, 0.32);
+      }
+
       .category-marker .category-pin b {
         transform: rotate(45deg);
         font-size: 13px;
@@ -311,6 +316,10 @@
       .category-marker.is-selected .category-pin {
         transform: rotate(-45deg) scale(1.2);
         background: #17242d;
+      }
+
+      .category-marker.is-selected.is-lodging .category-pin {
+        background: #1463b4;
       }
 
       .place-sheet {
@@ -378,6 +387,10 @@
         color: #fff;
         font-size: 13px;
         font-weight: 850;
+      }
+
+      .place-symbol.is-lodging {
+        background: #2483e2;
       }
 
       .place-copy {
@@ -483,6 +496,10 @@
 
       .place-list-button.is-selected .place-symbol {
         background: #17242d;
+      }
+
+      .place-list-button.is-selected .place-symbol.is-lodging {
+        background: #1463b4;
       }
 
       @media (max-width: 360px) {
@@ -608,7 +625,7 @@
         </button>
 
         <article id="selected-place" class="selected-place" aria-live="polite">
-          <span id="selected-symbol" class="place-symbol" aria-label="숙소">숙</span>
+          <span id="selected-symbol" class="place-symbol is-lodging" aria-label="숙소">숙</span>
           <span class="place-copy">
             <span id="selected-kind" class="place-kind">숙소</span>
             <strong id="selected-name">체스터톤스속초</strong>
@@ -766,6 +783,7 @@
             button.dataset.placeId = place.id;
             button.setAttribute("aria-label", `${category.label} ${place.name}`);
             symbol.className = "place-symbol";
+            symbol.classList.toggle("is-lodging", place.type === "lodging");
             symbol.textContent = category.symbol;
             symbol.setAttribute("aria-label", category.label);
             copy.className = "place-copy";
@@ -796,6 +814,7 @@
           const category = CATEGORY_META[place.type];
           selectedId = place.id;
           selectedSymbol.textContent = category.symbol;
+          selectedSymbol.classList.toggle("is-lodging", place.type === "lodging");
           selectedSymbol.setAttribute("aria-label", category.label);
           selectedKind.textContent = category.label;
           selectedKind.hidden = false;
@@ -996,7 +1015,7 @@
           for (const place of locations) {
             const category = CATEGORY_META[place.type];
             const icon = L.divIcon({
-              className: "category-marker",
+              className: `category-marker${place.type === "lodging" ? " is-lodging" : ""}`,
               html: `<span class="category-pin"><b aria-hidden="true">${category.symbol}</b></span>`,
               iconSize: [44, 52],
               iconAnchor: [22, 49],
